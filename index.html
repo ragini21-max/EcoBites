@@ -26,26 +26,62 @@
     </script>
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Leaflet CSS for Map -->
+    <!-- Leaflet CSS for Interactive Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet JS for Map -->
+    <!-- Leaflet JS for Interactive Map -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* Smooth Page Transition Styles */
+        .page-view {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .page-view.hidden-page {
+            display: none !important;
+            opacity: 0;
+            transform: translateY(12px) scale(0.99);
+        }
+        .page-view.page-enter-active {
+            animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Subtle Card Hover Effects */
+        .food-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .food-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
-<body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50">
+<body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50 selection:bg-emerald-500 selection:text-white">
 
     <!-- Top Announcement Bar -->
     <div class="bg-slate-900 text-slate-300 text-xs py-1.5 px-4 text-center font-medium flex items-center justify-center gap-2">
         <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>EcoBites Live: 3 Campus Kitchens & 2 Local Venues have surplus meals available for pickup!</span>
+        <span>EcoBites Live: 3 Campus Kitchens & 2 Local Venues in Pimpri-Chinchwad have surplus meals ready!</span>
     </div>
 
-    <!-- Clean Header Navbar -->
-    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <!-- Header Navbar -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Logo & Brand Name -->
                 <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('feed')">
-                    <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-emerald-400 shadow-sm">
+                    <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-emerald-400 shadow-sm transition-transform hover:scale-105">
                         <i data-lucide="leaf" class="w-5 h-5"></i>
                     </div>
                     <div>
@@ -59,32 +95,32 @@
 
                 <!-- Navigation Tabs -->
                 <nav class="hidden md:flex items-center gap-1">
-                    <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn active flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all">
+                    <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn active flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100">
                         <i data-lucide="layout-grid" class="w-4 h-4"></i>
                         Available Food
                     </button>
-                    <button onclick="switchTab('donate')" id="nav-donate" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all">
+                    <button onclick="switchTab('donate')" id="nav-donate" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         Post Surplus (Fast)
                     </button>
-                    <button onclick="switchTab('ngo')" id="nav-ngo" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all">
+                    <button onclick="switchTab('ngo')" id="nav-ngo" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100">
                         <i data-lucide="heart-handshake" class="w-4 h-4"></i>
                         NGO Claim Portal
                         <span id="ngo-badge" class="bg-emerald-600 text-white text-xs px-1.5 py-0.2 rounded-full font-bold">3</span>
                     </button>
-                    <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all">
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100">
                         <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
                         Impact
                     </button>
-                    <button onclick="switchTab('guidelines')" id="nav-guidelines" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all">
+                    <button onclick="switchTab('guidelines')" id="nav-guidelines" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-100">
                         <i data-lucide="shield-check" class="w-4 h-4"></i>
                         Safety Standards
                     </button>
                 </nav>
 
-                <!-- Header Actions -->
+                <!-- Header Action -->
                 <div class="flex items-center gap-3">
-                    <button onclick="switchTab('donate')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-all flex items-center gap-1.5">
+                    <button onclick="switchTab('donate')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-all hover:shadow-md flex items-center gap-1.5 active:scale-95">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         Share Food
                     </button>
@@ -102,7 +138,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <!-- PAGE 1: LIVE FEED -->
@@ -112,10 +148,10 @@
                 <div class="space-y-2 max-w-2xl">
                     <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider inline-block">Sustainability Network</span>
                     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Prevent Waste. Feed Your City.</h1>
-                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">EcoBites connects campus mess managers and food vendors directly with verified local shelters and NGOs in real-time.</p>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">EcoBites connects campus mess managers and food vendors directly with verified local shelters and NGOs across Pimpri-Chinchwad & Pune.</p>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
-                    <button onclick="switchTab('donate')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+                    <button onclick="switchTab('donate')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-95">
                         <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i>
                         Post Surplus Food
                     </button>
@@ -125,12 +161,12 @@
             <!-- Category Filter Bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900">Active Listings</h2>
-                    <p class="text-xs text-slate-500">Real-time availability from nearby dining facilities</p>
+                    <h2 class="text-lg font-bold text-slate-900">Active Campus Listings</h2>
+                    <p class="text-xs text-slate-500">Real-time availability from verified dining facilities with exact map locations</p>
                 </div>
                 <div class="flex items-center gap-2 overflow-x-auto pb-1">
                     <button onclick="filterCategory('all')" class="filter-btn active bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap">All Sources</button>
-                    <button onclick="filterCategory('Hostel Mess')" class="filter-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap">Hostels</button>
+                    <button onclick="filterCategory('Hostel Mess')" class="filter-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap">Hostel Messes</button>
                     <button onclick="filterCategory('Campus Canteen')" class="filter-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap">Canteens</button>
                     <button onclick="filterCategory('Restaurant')" class="filter-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap">Restaurants</button>
                 </div>
@@ -143,28 +179,27 @@
         </section>
 
         <!-- PAGE 2: FAST DONATE FORM -->
-        <section id="page-donate" class="page-view hidden max-w-2xl mx-auto space-y-6">
+        <section id="page-donate" class="page-view hidden-page max-w-2xl mx-auto space-y-6">
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
                 <div class="border-b border-slate-100 pb-4">
                     <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider inline-block mb-2">Fast Donor Entry</span>
                     <h2 class="text-2xl font-extrabold text-slate-900">Post Surplus Food in 20 Seconds</h2>
-                    <p class="text-slate-500 text-xs">Use preset dropdowns to quickly alert verified shelters without long typing.</p>
+                    <p class="text-slate-500 text-xs">Select your real institution & location to automatically pin your donation on Google Maps.</p>
                 </div>
 
                 <form id="fast-donation-form" onsubmit="handleFastFormSubmit(event)" class="space-y-5">
                     
-                    <!-- 1. Donor Facility Dropdown -->
+                    <!-- 1. Donor Facility Dropdown with Real Place Names -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Select Donor Facility</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Select Real Campus Facility</label>
                         <select id="form-facility" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none" required>
-                            <option value="">-- Choose Facility --</option>
-                            <option value="Hostel Block A Mess">Hostel Block A Mess</option>
-                            <option value="Hostel Block B Mess">Hostel Block B Mess</option>
-                            <option value="Girls Hostel Mess">Girls Hostel Mess</option>
-                            <option value="Central Student Canteen">Central Student Canteen</option>
-                            <option value="Campus Faculty Dining">Campus Faculty Dining</option>
-                            <option value="Main Street Bistro & Restaurant">Main Street Bistro & Restaurant</option>
-                            <option value="Grand Event Banquet Hall">Grand Event Banquet Hall</option>
+                            <option value="">-- Choose Real Facility --</option>
+                            <option value="Pimpri Chinchwad College of Engineering (PCCOE) Main Mess, Nigdi, Pimpri-Chinchwad">Pimpri Chinchwad College of Engineering (PCCOE) Mess</option>
+                            <option value="D.Y. Patil Institute of Technology Hostel Mess, Pimpri, Pune">D.Y. Patil Institute Hostel Mess, Pimpri</option>
+                            <option value="College of Engineering Pune (COEP) Boys Hostel Mess, Shivajinagar, Pune">COEP Boys Hostel Mess, Shivajinagar</option>
+                            <option value="MIT World Peace University Student Canteen, Kothrud, Pune">MIT World Peace University Canteen, Kothrud</option>
+                            <option value="Hotel Sayaji Buffet Kitchen, Wakad, Pimpri-Chinchwad">Hotel Sayaji Buffet Kitchen, Wakad</option>
+                            <option value="Barbeque Nation, Chinchwad, Pimpri-Chinchwad">Barbeque Nation, Chinchwad</option>
                         </select>
                     </div>
 
@@ -172,10 +207,10 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Meal Time Category</label>
                         <div class="grid grid-cols-4 gap-2" id="meal-time-toggles">
-                            <button type="button" onclick="selectMealTime(this, 'Breakfast')" class="meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100">Breakfast</button>
-                            <button type="button" onclick="selectMealTime(this, 'Lunch')" class="meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100">Lunch</button>
-                            <button type="button" onclick="selectMealTime(this, 'Snacks')" class="meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100">Snacks</button>
-                            <button type="button" onclick="selectMealTime(this, 'Dinner')" class="meal-toggle active bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs border border-emerald-600">Dinner</button>
+                            <button type="button" onclick="selectMealTime(this, 'Breakfast')" class="meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-all">Breakfast</button>
+                            <button type="button" onclick="selectMealTime(this, 'Lunch')" class="meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-all">Lunch</button>
+                            <button type="button" onclick="selectMealTime(this, 'Snacks')" class="meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-all">Snacks</button>
+                            <button type="button" onclick="selectMealTime(this, 'Dinner')" class="meal-toggle active bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs border border-emerald-600 shadow-sm transition-all">Dinner</button>
                         </div>
                     </div>
 
@@ -198,15 +233,15 @@
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Estimated Servings (People Fed)</label>
                         <div class="flex items-center gap-3">
                             <div class="flex items-center bg-slate-100 rounded-xl border border-slate-300 p-1">
-                                <button type="button" onclick="adjustServings(-10)" class="w-9 h-9 bg-white border border-slate-200 rounded-lg text-slate-700 font-bold text-lg hover:bg-slate-50 flex items-center justify-center">-</button>
+                                <button type="button" onclick="adjustServings(-10)" class="w-9 h-9 bg-white border border-slate-200 rounded-lg text-slate-700 font-bold text-lg hover:bg-slate-50 flex items-center justify-center transition-all active:scale-90">-</button>
                                 <input type="number" id="form-servings" value="40" min="5" class="w-16 text-center bg-transparent font-extrabold text-slate-900 text-lg border-none focus:outline-none" readonly>
-                                <button type="button" onclick="adjustServings(10)" class="w-9 h-9 bg-white border border-slate-200 rounded-lg text-slate-700 font-bold text-lg hover:bg-slate-50 flex items-center justify-center">+</button>
+                                <button type="button" onclick="adjustServings(10)" class="w-9 h-9 bg-white border border-slate-200 rounded-lg text-slate-700 font-bold text-lg hover:bg-slate-50 flex items-center justify-center transition-all active:scale-90">+</button>
                             </div>
                             <!-- Preset Buttons -->
                             <div class="flex gap-2">
-                                <button type="button" onclick="setServings(25)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700">+25</button>
-                                <button type="button" onclick="setServings(50)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700">+50</button>
-                                <button type="button" onclick="setServings(100)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700">+100</button>
+                                <button type="button" onclick="setServings(25)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700 transition-all">+25</button>
+                                <button type="button" onclick="setServings(50)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700 transition-all">+50</button>
+                                <button type="button" onclick="setServings(100)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700 transition-all">+100</button>
                             </div>
                         </div>
                     </div>
@@ -221,17 +256,6 @@
                         </select>
                     </div>
 
-                    <!-- 6. Pickup Location Dropdown -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pickup Gate / Dock</label>
-                        <select id="form-gate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none" required>
-                            <option value="Campus Gate 1 (North Entrance)">Campus Gate 1 (North Entrance)</option>
-                            <option value="Campus Rear Loading Dock (Gate 3)">Campus Rear Loading Dock (Gate 3)</option>
-                            <option value="Canteen Back Kitchen Service Road">Canteen Back Kitchen Service Road</option>
-                            <option value="City Center Main Road Front Office">City Center Main Road Front Office</option>
-                        </select>
-                    </div>
-
                     <!-- Safety Declaration Checkbox -->
                     <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl flex items-start gap-3">
                         <input type="checkbox" id="form-safety" class="mt-1 w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500" required>
@@ -241,7 +265,7 @@
                         </label>
                     </div>
 
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95">
                         <i data-lucide="send" class="w-4 h-4"></i>
                         Publish Alert to Nearby NGOs
                     </button>
@@ -250,18 +274,18 @@
         </section>
 
         <!-- PAGE 3: NGO CLAIM PORTAL WITH MAP -->
-        <section id="page-ngo" class="page-view hidden space-y-6">
+        <section id="page-ngo" class="page-view hidden-page space-y-6">
             <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Registered NGO Dashboard</span>
                     <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Surplus Map & Pickup Coordination</h2>
-                    <p class="text-slate-500 text-xs sm:text-sm">View exact GPS pickup pins and claim surplus items for your shelter.</p>
+                    <p class="text-slate-500 text-xs sm:text-sm">Click Google Maps Route to get step-by-step navigation directly to the canteen kitchen.</p>
                 </div>
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center gap-3">
                     <i data-lucide="truck" class="w-6 h-6 text-emerald-600"></i>
                     <div>
                         <p class="text-[10px] text-slate-400 font-bold uppercase">Logged in Organization</p>
-                        <p class="font-bold text-xs text-slate-900">City Hope Shelter & Foundation</p>
+                        <p class="font-bold text-xs text-slate-900">Aanand Balbhavan Orphanage & Shelter, Nigdi</p>
                     </div>
                 </div>
             </div>
@@ -271,9 +295,9 @@
                 <div class="flex items-center justify-between px-2">
                     <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
                         <i data-lucide="map-pin" class="w-4 h-4 text-emerald-600"></i>
-                        Live Campus & City Pickup Map
+                        Pimpri-Chinchwad & Pune Campus Pickup Pins
                     </h3>
-                    <span class="text-xs text-slate-500">Interactive Pin Navigation</span>
+                    <span class="text-xs text-slate-500">Real GPS OpenStreetMap View</span>
                 </div>
                 <!-- Leaflet Container -->
                 <div id="leaflet-map" class="w-full h-72 rounded-2xl border border-slate-200 z-0"></div>
@@ -285,26 +309,26 @@
         </section>
 
         <!-- PAGE 4: IMPACT ANALYTICS -->
-        <section id="page-analytics" class="page-view hidden space-y-6">
+        <section id="page-analytics" class="page-view hidden-page space-y-6">
             <div class="border-b border-slate-200 pb-4">
                 <h2 class="text-2xl font-extrabold text-slate-900">Network Environmental Impact</h2>
-                <p class="text-slate-500 text-xs sm:text-sm">Data metrics tracking meals rescued and food waste diverted from landfills.</p>
+                <p class="text-slate-500 text-xs sm:text-sm">Data metrics tracking meals rescued and food waste diverted from Pune landfills.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transition-transform hover:scale-105">
                     <p class="text-3xl font-black text-slate-900">14,280</p>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Meals Shared</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transition-transform hover:scale-105">
                     <p class="text-3xl font-black text-slate-900">3,570 kg</p>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Waste Diverted</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transition-transform hover:scale-105">
                     <p class="text-3xl font-black text-slate-900">8,925 kg</p>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">CO₂ Prevented</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transition-transform hover:scale-105">
                     <p class="text-3xl font-black text-slate-900">99.1%</p>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Claim Rate</p>
                 </div>
@@ -312,24 +336,24 @@
         </section>
 
         <!-- PAGE 5: HYGIENE & SAFETY -->
-        <section id="page-guidelines" class="page-view hidden space-y-6 max-w-4xl mx-auto">
+        <section id="page-guidelines" class="page-view hidden-page space-y-6 max-w-4xl mx-auto">
             <div class="text-center space-y-2 mb-6">
                 <h2 class="text-2xl font-extrabold text-slate-900">Food Safety & Quality Guidelines</h2>
-                <p class="text-slate-500 text-xs sm:text-sm">Standard protocols based on international food handling regulations.</p>
+                <p class="text-slate-500 text-xs sm:text-sm">Standard protocols based on FSSAI food handling regulations.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2 transition-transform hover:scale-105">
                     <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm">1</span>
                     <h3 class="font-bold text-slate-900 text-sm">Temperature Control</h3>
                     <p class="text-xs text-slate-600">Hot meals must be kept above 60°C. Cold items stored under 5°C before pickup.</p>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2 transition-transform hover:scale-105">
                     <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm">2</span>
                     <h3 class="font-bold text-slate-900 text-sm">Safe Packaging</h3>
                     <p class="text-xs text-slate-600">Food must be stored in food-grade covered containers or wrapped aluminum trays.</p>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2 transition-transform hover:scale-105">
                     <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm">3</span>
                     <h3 class="font-bold text-slate-900 text-sm">Inspection Protocol</h3>
                     <p class="text-xs text-slate-600">NGO drivers inspect visual quality, aroma, and packaging seal prior to handover.</p>
@@ -347,49 +371,52 @@
 
     <!-- JavaScript Application Code -->
     <script>
-        // Sample Data with GPS Coordinates for Maps
+        // Real Location Data with exact Google Maps search queries and GPS Coordinates for PCMC/Pune
         let foodItems = [
             {
                 id: 1,
-                provider: "Hostel Block A Mess",
+                provider: "PCCOE Main Canteen Mess",
                 category: "Hostel Mess",
                 title: "Steamed Rice, Dal Tadka & Chapati",
                 mealTime: "Dinner",
                 servings: 45,
                 expiryHours: 3,
-                location: "Campus Gate 1 (North Entrance)",
-                lat: 18.5204,
-                lng: 73.8567,
+                location: "Pimpri Chinchwad College of Engineering, Sector 26, Pradhikaran, Nigdi, Pimpri-Chinchwad, Maharashtra",
+                googleQuery: "Pimpri Chinchwad College of Engineering, Nigdi, Pune",
+                lat: 18.6517,
+                lng: 73.7698,
                 phone: "+91 98765 12345",
                 status: "available",
                 claimedBy: null
             },
             {
                 id: 2,
-                provider: "Central Student Canteen",
-                category: "Campus Canteen",
+                provider: "D.Y. Patil Institute Hostel Mess",
+                category: "Hostel Mess",
                 title: "Veg Biryani & Mix Vegetable Raita",
                 mealTime: "Dinner",
-                servings: 30,
+                servings: 35,
                 expiryHours: 2,
-                location: "Canteen Back Kitchen Service Road",
-                lat: 18.5240,
-                lng: 73.8520,
+                location: "Dr. D. Y. Patil Institute of Technology, Sant Tukaram Nagar, Pimpri, Pune, Maharashtra",
+                googleQuery: "Dr D Y Patil Institute of Technology, Pimpri, Pune",
+                lat: 18.6223,
+                lng: 73.8152,
                 phone: "+91 98765 67890",
                 status: "available",
                 claimedBy: null
             },
             {
                 id: 3,
-                provider: "Main Street Bistro & Restaurant",
+                provider: "Hotel Sayaji Buffet Kitchen",
                 category: "Restaurant",
-                title: "Assorted Buffet Meals (Veg)",
+                title: "Assorted Premium Buffet Meals (Veg)",
                 mealTime: "Dinner",
                 servings: 60,
                 expiryHours: 4,
-                location: "City Center Main Road Front Office",
-                lat: 18.5150,
-                lng: 73.8600,
+                location: "Hotel Sayaji, Mumbai-Bangalore Highway, Wakad, Pimpri-Chinchwad, Maharashtra",
+                googleQuery: "Hotel Sayaji, Wakad, Pune",
+                lat: 18.5986,
+                lng: 73.7618,
                 phone: "+91 91234 56789",
                 status: "available",
                 claimedBy: null
@@ -399,14 +426,38 @@
         let selectedMealCategory = 'Dinner';
         let activeCategoryFilter = 'all';
         let leafletMapInstance = null;
-        let mapMarkers = [];
 
-        // Tab Switching Controller
+        // Smooth Page Transition Controller
         function switchTab(tabId) {
-            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            const allPages = document.querySelectorAll('.page-view');
             const targetPage = document.getElementById(`page-${tabId}`);
-            if (targetPage) targetPage.classList.remove('hidden');
+            
+            if (!targetPage || targetPage.classList.contains('page-enter-active')) return;
 
+            // Fade out current page smoothly
+            allPages.forEach(el => {
+                if (!el.classList.contains('hidden-page')) {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        el.classList.add('hidden-page');
+                        el.style.opacity = '';
+                        el.style.transform = '';
+                    }, 200);
+                }
+            });
+
+            // Bring in target page with CSS animation
+            setTimeout(() => {
+                targetPage.classList.remove('hidden-page');
+                targetPage.classList.add('page-enter-active');
+
+                setTimeout(() => {
+                    targetPage.classList.remove('page-enter-active');
+                }, 350);
+            }, 200);
+
+            // Update Navigation Button Styling
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-slate-100', 'text-slate-900', 'font-bold');
                 btn.classList.add('text-slate-600');
@@ -417,21 +468,22 @@
                 activeNav.classList.remove('text-slate-600');
             }
 
+            // Specific page actions
             if (tabId === 'feed') renderFeedListings();
             if (tabId === 'ngo') {
                 renderNgoListings();
-                setTimeout(initLeafletMap, 200); // Initialize map on view switch
+                setTimeout(initLeafletMap, 300); // Initialize Leaflet map cleanly
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Form Stepper & Selector Handlers
+        // Form Handlers & Steppers
         function selectMealTime(btn, mealName) {
             document.querySelectorAll('.meal-toggle').forEach(b => {
-                b.className = "meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100";
+                b.className = "meal-toggle bg-slate-50 border border-slate-200 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-all";
             });
-            btn.className = "meal-toggle active bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs border border-emerald-600";
+            btn.className = "meal-toggle active bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs border border-emerald-600 shadow-sm transition-all";
             selectedMealCategory = mealName;
         }
 
@@ -453,7 +505,6 @@
             const combo = document.getElementById('form-combo').value;
             const servings = parseInt(document.getElementById('form-servings').value);
             const expiry = parseFloat(document.getElementById('form-expiry').value);
-            const gate = document.getElementById('form-gate').value;
 
             if (!facility || !combo) {
                 alert("Please select both facility and food items combo!");
@@ -462,15 +513,16 @@
 
             const newPost = {
                 id: foodItems.length + 1,
-                provider: facility,
-                category: facility.includes('Hostel') ? 'Hostel Mess' : (facility.includes('Canteen') ? 'Campus Canteen' : 'Restaurant'),
+                provider: facility.split(',')[0],
+                category: facility.includes('College') || facility.includes('COEP') || facility.includes('Hostel') ? 'Hostel Mess' : 'Restaurant',
                 title: combo,
                 mealTime: selectedMealCategory,
                 servings: servings,
                 expiryHours: expiry,
-                location: gate,
-                lat: 18.5210 + (Math.random() - 0.5) * 0.01,
-                lng: 73.8550 + (Math.random() - 0.5) * 0.01,
+                location: facility,
+                googleQuery: facility,
+                lat: 18.6400 + (Math.random() - 0.5) * 0.04,
+                lng: 73.7700 + (Math.random() - 0.5) * 0.04,
                 phone: "+91 98765 00000",
                 status: 'available',
                 claimedBy: null
@@ -494,9 +546,10 @@
                 : foodItems.filter(item => item.category === activeCategoryFilter);
 
             filtered.forEach(item => {
-                const mapSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location + " " + item.provider)}`;
+                // Direct accurate Google Maps URL using real place search query
+                const mapSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.googleQuery || item.location)}`;
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 flex flex-col justify-between";
+                card.className = "food-card bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 flex flex-col justify-between";
                 card.innerHTML = `
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
@@ -511,18 +564,18 @@
                             <span>Quantity: ${item.servings} Servings</span>
                             <span class="text-emerald-700 font-bold">Pure Veg</span>
                         </div>
-                        <p class="text-xs text-slate-500 flex items-center gap-1">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${item.location}
+                        <p class="text-xs text-slate-500 flex items-start gap-1 line-clamp-2">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5"></i> <span>${item.location}</span>
                         </p>
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 flex gap-2">
-                        <a href="${mapSearchUrl}" target="_blank" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-1">
+                        <a href="${mapSearchUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-1 active:scale-95">
                             <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Google Maps
                         </a>
                         ${item.status === 'claimed'
                             ? `<button disabled class="flex-1 bg-slate-100 text-slate-400 py-2 rounded-xl text-xs font-bold">Claimed</button>`
-                            : `<button onclick="switchTab('ngo')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold transition-all">Claim Item</button>`
+                            : `<button onclick="switchTab('ngo')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold transition-all active:scale-95">Claim Item</button>`
                         }
                     </div>
                 `;
@@ -543,20 +596,20 @@
             }
 
             available.forEach(item => {
-                const mapSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location + " " + item.provider)}`;
+                const mapSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.googleQuery || item.location)}`;
                 const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4";
+                card.className = "food-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4";
                 card.innerHTML = `
                     <div class="space-y-1">
                         <span class="bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">${item.category} • ${item.servings} Servings</span>
                         <h3 class="font-bold text-slate-900 text-base">${item.title}</h3>
-                        <p class="text-xs text-slate-500">${item.provider} | Pickup: ${item.location}</p>
+                        <p class="text-xs text-slate-500">${item.provider} | Location: ${item.location}</p>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <a href="${mapSearchUrl}" target="_blank" class="bg-slate-100 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1">
-                            <i data-lucide="map" class="w-3.5 h-3.5"></i> Maps Route
+                        <a href="${mapSearchUrl}" target="_blank" rel="noopener noreferrer" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1 active:scale-95">
+                            <i data-lucide="map" class="w-3.5 h-3.5"></i> Google Maps Route
                         </a>
-                        <button onclick="claimItem(${item.id})" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700">
+                        <button onclick="claimItem(${item.id})" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700 active:scale-95">
                             Claim Pickup
                         </button>
                     </div>
@@ -570,7 +623,7 @@
             const item = foodItems.find(i => i.id === id);
             if (item) {
                 item.status = 'claimed';
-                item.claimedBy = 'City Hope Shelter';
+                item.claimedBy = 'Aanand Balbhavan Orphanage';
                 document.getElementById('ngo-badge').innerText = foodItems.filter(i => i.status === 'available').length;
                 alert(`Claimed successfully! Directions sent to driver.`);
                 renderNgoListings();
@@ -578,10 +631,13 @@
             }
         }
 
-        // Initialize Map
+        // Initialize Map centered around Pimpri-Chinchwad / Pune
         function initLeafletMap() {
-            if (leafletMapInstance) return;
-            leafletMapInstance = L.map('leaflet-map').setView([18.5204, 73.8567], 13);
+            if (leafletMapInstance) {
+                leafletMapInstance.invalidateSize();
+                return;
+            }
+            leafletMapInstance = L.map('leaflet-map').setView([18.6278, 73.8131], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap'
             }).addTo(leafletMapInstance);
